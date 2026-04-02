@@ -2,10 +2,8 @@ import os
 
 from dotenv import load_dotenv
 from langchain_core.prompts import PromptTemplate
-
 # from langchain_openai import ChatOpenAI
 from langchain_ollama import ChatOllama
-
 
 load_dotenv()  # Load environment variables from .env file
 
@@ -47,6 +45,7 @@ Musk's political activities, views, and statements have made him a polarizing fi
     )  # created a chain that first formats the prompt and then sends it to the language model
 
     response = chain.invoke(input={"information": information})
+    # here the key in input should match the input_variable defined in the prompt template, and the value is the actual information we want to summarize
     print(response.content)
 
 
