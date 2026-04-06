@@ -124,22 +124,22 @@ if __name__ == "__main__":
     # ========================================================================
     # Option 0: Raw invocation without RAG
     # ========================================================================
-    # print("\n" + "=" * 70)
-    # print("IMPLEMENTATION 0: Raw LLM Invocation (No RAG)")
-    # print("=" * 70)
-    # result_raw = llm.invoke([HumanMessage(content=query)])
-    # print("\nAnswer:")
-    # print(result_raw.content)
+    print("\n" + "=" * 70)
+    print("IMPLEMENTATION 0: Raw LLM Invocation (No RAG)")
+    print("=" * 70)
+    result_raw = llm.invoke([HumanMessage(content=query)])
+    print("\nAnswer:")
+    print(result_raw.content)
 
     # ========================================================================
     # Option 1: Use implementation WITHOUT LCEL
     # ========================================================================
-    # print("\n" + "=" * 70)
-    # print("IMPLEMENTATION 1: Without LCEL")
-    # print("=" * 70)
-    # result_without_lcel = retrieval_chain_without_lcel(query)
-    # print("\nAnswer:")
-    # print(result_without_lcel)
+    print("\n" + "=" * 70)
+    print("IMPLEMENTATION 1: Without LCEL")
+    print("=" * 70)
+    result_without_lcel = retrieval_chain_without_lcel(query)
+    print("\nAnswer:")
+    print(result_without_lcel)
 
     # ========================================================================
     # Option 2: Use implementation WITH LCEL (Better Approach)
