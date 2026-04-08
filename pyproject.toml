@@ -5,14 +5,22 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
+    "beautifulsoup4>=4.14.3",
     "black>=25.1.0",
+    "fastapi>=0.135.3",
     "isort>=6.0.1",
+    "jinja2>=3.1.6",
     "langchain>=0.3.27",
+    "langchain-chroma>=1.1.0",
     "langchain-community>=0.3.27",
     "langchain-core>=1.2.26",
     "langchain-ollama>=1.0.1",
     "langchain-openai>=0.3.31",
     "langchain-pinecone>=0.2.11",
     "langchainhub>=0.1.21",
+    "pillow>=12.2.0",
     "python-dotenv>=1.1.1",
+    "tiktoken>=0.12.0",
+    "tqdm>=4.67.3",
+    "uvicorn>=0.44.0",
 ]
