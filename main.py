@@ -1,70 +1,59 @@
-# run with "streamlit run main.py "
-
-from typing import Any, Dict, List
-
-import streamlit as st
-
-from backend.core import run_llm
+from dotenv import load_dotenv
+from langgraph.graph import MessagesState, StateGraph, END
+from langchain_core.messages import HumanMessage
+from nodes import run_agent_reasoning, tool_node
 
 
-def _format_sources(context_docs: List[Any]) -> List[str]:
-    return [
-        str((meta.get("source") or "Unknown"))
-        for doc in (context_docs or [])
-        if (meta := (getattr(doc, "metadata", None) or {})) is not None
-    ]
+load_dotenv()
 
 
-st.set_page_config(page_title="LangChain Documentation Helper", layout="centered")
-st.title("LangChain Documentation Helper")
+# define some variables so that we do not need to write strings in the code
+AGENT_REASON = "agent_reason"
+ACT = "act"
+LAST = -1
 
-with st.sidebar:
-    st.subheader("Session")
-    if st.button("Clear chat", use_container_width=True):
-        st.session_state.pop("messages", None)
-        st.rerun()
 
-if "messages" not in st.session_state:
-    st.session_state.messages = [
+def should_continue(state: MessagesState) -> str:
+    """if the LAST message tells us the LLM wants to call a tool, then we should go to act,
+    else we go to the end
+
+    Args:
+        state (MessagesState): _description_
+
+    Returns:
+        str: _description
+    print("Hello ReAct LangGraph with Function Calling")
+    res = app.invoke({"messages": [HumanMessage(content="What is the temperature in Tokyo? List it and then triple it")]})
+    print(res["messages"][LAST].content)_
+    """
+    if not state["messages"][LAST].tool_calls:
+        return END
+    return ACT
+
+
+flow = StateGraph(MessagesState)
+flow.add_node(AGENT_REASON, run_agent_reasoning)
+flow.set_entry_point(AGENT_REASON)
+flow.add_node(ACT, tool_node)
+
+flow.add_conditional_edges(AGENT_REASON, should_continue, {END: END, ACT: ACT})
+
+flow.add_edge(ACT, AGENT_REASON)
+
+app = flow.compile()
+
+app.get_graph().draw_mermaid_png(output_file_path="flow.png")
+
+
+if __name__ == "__main__":
+    print("Hello ReAct LangGraph with Function Calling")
+    res = app.invoke(
         {
-            "role": "assistant",
-            "content": "Ask me anything about LangChain docs. I’ll retrieve relevant context and cite sources.",
-            "sources": [],
-        }
-    ]
-
-for msg in st.session_state.messages:
-    with st.chat_message(msg["role"]):
-        st.markdown(msg["content"])
-        if msg.get("sources"):
-            with st.expander("Sources"):
-                for s in msg["sources"]:
-                    st.markdown(f"- {s}")
-
-prompt = st.chat_input("Ask a question about LangChain…")
-if prompt:
-    st.session_state.messages.append({"role": "user", "content": prompt, "sources": []})
-    with st.chat_message("user"):
-        st.markdown(prompt)
-
-    with st.chat_message("assistant"):
-        try:
-            with st.spinner("Retrieving docs and generating answer…"):
-                result: Dict[str, Any] = run_llm(prompt)
-                answer = (
-                    str(result.get("answer", "")).strip() or "(No answer returned.)"
+            "messages": [
+                HumanMessage(
+                    content="What is the temperature in Tokyo? List it and then triple it"
                 )
-                sources = _format_sources(result.get("context", []))
-
-            st.markdown(answer)
-            if sources:
-                with st.expander("Sources"):
-                    for s in sources:
-                        st.markdown(f"- {s}")
-
-            st.session_state.messages.append(
-                {"role": "assistant", "content": answer, "sources": sources}
-            )
-        except Exception as e:
-            st.error("Failed to generate a response.")
-            st.exception(e)
+            ]
+        }
+    )
+    print(res["messages"][LAST].content)
